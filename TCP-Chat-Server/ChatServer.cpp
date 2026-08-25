@@ -123,19 +123,74 @@ void chatserver::handleclient(SOCKET clientsocket) {
 	
 	char buffer[4097];
 
+	const char* prompt = "Enter username: ";
+
+	send(clientsocket, prompt, static_cast<int>(strlen(prompt)), 0);
+
+	char usernamebuffer[256];
+
+	int usernamebytes = recv(clientsocket, usernamebuffer, sizeof(usernamebuffer) - 1, 0);
+
+	if (usernamebytes <= 0) {
+		cout << "\nClient disconnected before entering username.\n";
+		removeclient(clientsocket);
+		closesocket(clientsocket);
+		return;
+	}
+
+	usernamebuffer[usernamebytes] = '\0';
+
+	string username(usernamebuffer);
+
+	{
+		lock_guard<mutex>lock(clientsmutex);
+
+		for (auto& client : clients) {
+			if (client.getsocket() == clientsocket) {
+				client.setusername(username);
+				break;
+			}
+		}
+	}
+
+	{
+		lock_guard<mutex>lock(coutmutex);
+
+		cout << "user connected: " << username <<endl;
+	}
+
+	
+
 	while (true) {
 		int bytereceived = recv(clientsocket, buffer, sizeof(buffer) - 1, 0);
 
 		if (bytereceived <= 0) {
-			cout << "\nClient disconnected!\n";
-			return;
+			{
+				lock_guard<mutex> lock(coutmutex);
+
+				cout << username
+					<< " disconnected!"
+					<< endl;
+			}
+
+			break;
 		}
 
 		buffer[bytereceived] = '\0';
 
-		cout << "\nClient says: " << buffer;
+		string message(buffer);
 
-		BroadcastMessage(string(buffer), clientsocket);
+		{
+			lock_guard<mutex> lock(coutmutex);
+
+			cout << username
+				<< ": "
+				<< message << endl;
+		}
+
+		string formattedmessage =username + ": " + message;
+
+		BroadcastMessage(formattedmessage, clientsocket);
 	}
 	
 	removeclient(clientsocket);
@@ -146,16 +201,30 @@ void chatserver::handleclient(SOCKET clientsocket) {
 
 void chatserver::removeclient(SOCKET clientsocket) {
 	
-	lock_guard<mutex> lock(clientsmutex);
+	size_t connectedclients;
 
-	for (auto it = clients.begin(); it != clients.end();++it) {
-		if (it->getsocket() == clientsocket) {
-			clients.erase(it);
-			break;
+	{
+		lock_guard<mutex> lock(clientsmutex);
+
+		for (auto it = clients.begin(); it != clients.end(); ++it)
+		{
+			if (it->getsocket() == clientsocket)
+			{
+				clients.erase(it);
+				break;
+			}
 		}
+
+		connectedclients = clients.size();
 	}
 
-	cout << "\nClient Removed. Connected clients:" << clients.size();
+	{
+		lock_guard<mutex> lock(coutmutex);
+
+		cout << "Client removed. Connected clients: "
+			<< connectedclients
+			<< endl;
+	}
 }
 
 
@@ -182,7 +251,9 @@ void chatserver::BroadcastMessage(
 			clientsocket, message.c_str(), static_cast<int>(message.size()), 0);
 
 		if (bytesent == SOCKET_ERROR) {
-			cout << "Failed to send message to client\n";
+
+			lock_guard<mutex> lock(coutmutex);
+			cout << "Failed to send message to client" << endl;
 		}
 	}
 

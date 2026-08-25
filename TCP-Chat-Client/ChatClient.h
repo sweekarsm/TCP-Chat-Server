@@ -14,6 +14,7 @@ public:
     bool connect();
 
     void sendmessage(const std::string& message);
+    string receivemessage();
     void receivemessages();
 
 private:
