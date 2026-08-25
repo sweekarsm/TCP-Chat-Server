@@ -31,4 +31,5 @@ private:
 
 	vector<clientsession> clients;
 	mutex clientsmutex; 
+	mutex coutmutex;
 };

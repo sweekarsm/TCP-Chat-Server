@@ -87,7 +87,20 @@ void chatclient::sendmessage(const std::string& message)
         return;
     }
 
-    std::cout << "Message sent.\n";
+    
+}
+
+string chatclient::receivemessage() {
+    char buffer[4097];
+
+    int bytesreceived = recv(clientsocket, buffer, sizeof(buffer) - 1, 0);
+
+    if (bytesreceived <= 0) {
+        return "";
+    }
+
+    buffer[bytesreceived] = '\0';
+    return string(buffer);
 }
 
 void chatclient::receivemessages() {
@@ -105,8 +118,11 @@ void chatclient::receivemessages() {
 
         buffer[bytesreceived] = '\0';
 
-        cout << "\nServer: " << buffer << "\nYou:";
+        cout << "\r" <<buffer << endl;
+        cout << "You:" << flush;
     }
 
     
 }
+
+

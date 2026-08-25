@@ -12,6 +12,6 @@ string clientsession::getusername() const {
 	return username;
 }
 
-void clientsession::setusername(const::string& newusername) {
-	username = newusername;
+void clientsession::setusername(const::string& name) {
+	username = name;
 }

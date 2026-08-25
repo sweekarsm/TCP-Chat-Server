@@ -11,7 +11,7 @@ public:
 	SOCKET getsocket() const;
 
 	string getusername() const;
-	void setusername(const string& username);
+	void setusername(const string& name);
 
 private:
 	SOCKET clientsocket;
