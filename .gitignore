@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+.vscode/
+
+# Build output
+x64/
+x86/
+Debug/
+Release/
+
+# Compiled files
+*.obj
+*.exe
+*.dll
+*.pdb
+*.ilk
+
+# Visual Studio user-specific files
+*.user
+*.suo
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+
+# Logs
+*.log

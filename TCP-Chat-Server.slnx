@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="TCP-Chat-Client/TCP-Chat-Client.vcxproj" Id="eaa73e90-1bd8-42e4-b5fd-c6bea5e53c36" />
+  <Project Path="TCP-Chat-Server/TCP-Chat-Server.vcxproj" Id="391ac621-bf8a-49a2-b9f6-19d86018508b" />
+</Solution>
